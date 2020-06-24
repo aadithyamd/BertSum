@@ -4,7 +4,7 @@ import torch.nn as nn
 from pytorch_pretrained_bert import BertModel, BertConfig
 from torch.nn.init import xavier_uniform_
 
-from models.encoder import TransformerInterEncoder, Classifier, RNNEncoder
+from models.encoder import TransformerInterEncoder, Classifier, RNNEncoder, MultiLayerClassifier
 from models.optimizers import Optimizer
 
 
@@ -63,6 +63,8 @@ class Summarizer(nn.Module):
         self.bert = Bert(args.temp_dir, load_pretrained_bert, bert_config)
         if (args.encoder == 'classifier'):
             self.encoder = Classifier(self.bert.model.config.hidden_size)
+        elif (args.encoder == 'multi_layer_classifier'):
+            self.encoder = MultiLayerClassifier(self.bert.model.config.hidden_size, 32)
         elif(args.encoder=='transformer'):
             self.encoder = TransformerInterEncoder(self.bert.model.config.hidden_size, args.ff_size, args.heads,
                                                    args.dropout, args.inter_layers)

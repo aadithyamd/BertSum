@@ -18,6 +18,17 @@ class Classifier(nn.Module):
         sent_scores = self.sigmoid(h) * mask_cls.float()
         return sent_scores
 
+class MultiLayerClassifier(nn.Module):
+    def __init__(self, hidden_size1, hidden_size2):
+        super(MultiLayerClassifier, self).__init__()
+        self.linear1 = nn.Linear(hidden_size1, hidden_size2)
+        self.linear2 = nn.Linear(hidden_size2, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x, mask_cls):
+        h = self.linear2(self.linear1(x)).squeeze(-1)
+        sent_scores = self.sigmoid(h) * mask_cls.float()
+        return sent_scores
 
 class PositionalEncoding(nn.Module):
 
@@ -94,7 +105,7 @@ class TransformerInterEncoder(nn.Module):
         x = x + pos_emb
 
         for i in range(self.num_inter_layers):
-            x = self.transformer_inter[i](i, x, x, 1 - mask)  # all_sents * max_tokens * dim
+            x = self.transformer_inter[i](i, x, x, ~mask)  # all_sents * max_tokens * dim
 
         x = self.layer_norm(x)
         sent_scores = self.sigmoid(self.wo(x))
