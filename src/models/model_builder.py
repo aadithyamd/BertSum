@@ -48,9 +48,9 @@ class Bert(nn.Module):
         else:
             self.model = BertModel(bert_config)
 
-    def forward(self, x, segs, mask):
+    def forward(self, x, segs, mask, out_layer = -1):
         encoded_layers, _ = self.model(x, segs, attention_mask =mask)
-        top_vec = encoded_layers[-1]
+        top_vec = encoded_layers[out_layer]
         return top_vec
 
 
@@ -92,7 +92,7 @@ class Summarizer(nn.Module):
 
     def forward(self, x, segs, clss, mask, mask_cls, sentence_range=None):
 
-        top_vec = self.bert(x, segs, mask)
+        top_vec = self.bert(x, segs, mask, self.args.out_layer)
         sents_vec = top_vec[torch.arange(top_vec.size(0)).unsqueeze(1), clss]
         sents_vec = sents_vec * mask_cls[:, :, None].float()
         sent_scores = self.encoder(sents_vec, mask_cls).squeeze(-1)

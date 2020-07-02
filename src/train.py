@@ -294,6 +294,7 @@ if __name__ == '__main__':
     parser.add_argument("-heads", default=4, type=int)
     parser.add_argument("-inter_layers", default=2, type=int)
     parser.add_argument("-rnn_size", default=512, type=int)
+    parser.add_argument("-out_layer", default=-1, type=int)
 
     parser.add_argument("-param_init", default=0, type=float)
     parser.add_argument("-param_init_glorot", type=str2bool, nargs='?',const=True,default=True)
