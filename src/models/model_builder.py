@@ -61,6 +61,16 @@ class Summarizer(nn.Module):
         self.args = args
         self.device = device
         self.bert = Bert(args.temp_dir, load_pretrained_bert, bert_config)
+        if (args.freeze_initial > 0):
+            for param in self.bert.model.encoder.layer[0:args.freeze_initial].parameters():
+                param.requires_grad = False
+            print("*" * 80)
+            print("*" * 80)
+            print("Initial Layers of BERT is frozen, ie first ",args.freeze_initial, "Layers")
+            print(self.bert.model.encoder.layer[0:args.freeze_initial])
+            print("*" * 80)
+            print("*" * 80)
+            
         if (args.encoder == 'classifier'):
             self.encoder = Classifier(self.bert.model.config.hidden_size)
         elif (args.encoder == 'multi_layer_classifier'):
